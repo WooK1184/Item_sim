@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql" // DBMS에 따라 변경
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id         Int         @id @default(autoincrement()) // 계정 ID
+  username   String      @unique // 계정 이름
+  password   String // 비밀번호
+  characters Character[] // 1:N 관계 (계정 - 캐릭터)
+  createdAt  DateTime    @default(now()) // 생성 시각
+  updatedAt  DateTime    @updatedAt // 업데이트 시각
+}
+
+model Character {
+  id            Int            @id @default(autoincrement()) // 캐릭터 ID
+  name          String // 캐릭터 이름
+  level         Int            @default(1) // 캐릭터 레벨
+  accountId     Int // 소속 계정 ID
+  account       Account        @relation(fields: [accountId], references: [id])
+  inventoryId   Int            @unique
+  inventory     Inventory      @relation(fields: [inventoryId], references: [id]) // 1:1 관계 (캐릭터 - 인벤토리)
+  equippedItems EquippedItem[] // 1:N 관계 (캐릭터 - 장착 아이템)
+  createdAt     DateTime       @default(now()) // 생성 시각
+  updatedAt     DateTime       @updatedAt // 업데이트 시각
+}
+
+model Inventory {
+  id             Int             @id @default(autoincrement()) // 인벤토리 ID
+  character      Character?
+  inventoryItems InventoryItem[] // 1:N 관계 (인벤토리 - 인벤토리 아이템)
+  createdAt      DateTime        @default(now()) // 생성 시각
+  updatedAt      DateTime        @updatedAt // 업데이트 시각
+}
+
+model InventoryItem {
+  id          Int       @id @default(autoincrement()) // 고유 ID
+  inventoryId Int // 소속 인벤토리 ID
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+  itemId      Int // 참조 아이템 ID
+  item        Item      @relation(fields: [itemId], references: [id])
+  quantity    Int       @default(1) // 아이템 개수
+  createdAt   DateTime  @default(now()) // 생성 시각
+  updatedAt   DateTime  @updatedAt // 업데이트 시각
+}
+
+model Item {
+  id             Int             @id @default(autoincrement()) // 아이템 ID
+  name           String // 아이템 이름
+  description    String? // 아이템 설명
+  rarity         String          @default("common") // 아이템 희귀도
+  inventoryitems InventoryItem[]
+  equippeditems  EquippedItem[] // 
+  createdAt      DateTime        @default(now()) // 생성 시각
+  updatedAt      DateTime        @updatedAt // 업데이트 시각
+}
+
+model EquippedItem {
+  id          Int       @id @default(autoincrement()) // 고유 ID
+  characterId Int // 소속 캐릭터 ID
+  character   Character @relation(fields: [characterId], references: [id])
+  itemId      Int // 참조 아이템 ID
+  item        Item      @relation(fields: [itemId], references: [id])
+  slot        String // 장착 슬롯 (예: "weapon", "armor")
+  createdAt   DateTime  @default(now()) // 생성 시각
+  updatedAt   DateTime  @updatedAt // 업데이트 시각
+}

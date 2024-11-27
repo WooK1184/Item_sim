@@ -18,3 +18,71 @@ export const createItem = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+//아이템 수정 API
+export const updateItem = async (req, res) => {
+    const { id: itemId } = req.params;
+    const { name, description, rarity } = req.body;
+
+    try {
+        const item = await prisma.item.update({
+            where: { id: Number(itemId) },
+            data: {
+                name,
+                description,
+                rarity,
+            },
+        });
+
+        res.status(200).json(item);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+//아이템 목록 조회 API
+
+export const getItemList = async (req, res) => {
+    try {
+        // 아이템 데이터 가져오기
+        const items = await prisma.item.findMany({
+            select: {
+                name: true, // 아이템 이름
+                description: true, // 아이템 설명
+                rarity: true, // 아이템 희귀도
+            },
+        });
+
+        res.status(200).json(items);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+//아이템 상세 조회 API
+
+export const getItemDetails = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // 아이템 조회
+        const item = await prisma.item.findUnique({
+            where: { id: parseInt(id) },
+            select: {
+                id: true, // 아이템 코드
+                name: true, // 아이템 이름
+                description: true, // 아이템 설명
+                rarity: true, // 아이템 희귀도
+            },
+        });
+
+        if (!item) {
+            return res.status(404).json({ error: "Item not found" });
+        }
+
+        res.status(200).json(item);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

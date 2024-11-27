@@ -26,11 +26,14 @@ model Character {
   id            Int            @id @default(autoincrement()) // 캐릭터 ID
   name          String // 캐릭터 이름
   job           String // 캐릭터 직업
-  accountId     Int // 소속 계정 ID
+  health        Int?           @default(500)
+  power         Int?           @default(100)
+  accountId     Int // 계정 ID
   account       Account        @relation(fields: [accountId], references: [id])
   inventoryId   Int            @unique
   inventory     Inventory      @relation(fields: [inventoryId], references: [id]) // 1:1 관계 (캐릭터 - 인벤토리)
   equippedItems EquippedItem[] // 1:N 관계 (캐릭터 - 장착 아이템)
+  gameMoney      Int            @default(10000) // 초기 생성 자본
   createdAt     DateTime       @default(now()) // 생성 시각
   updatedAt     DateTime       @updatedAt // 업데이트 시각
 }

@@ -18,6 +18,8 @@ export const createCharacter = async (req, res) => {
             data: {
                 name,
                 job: job || "adventurer",
+                health: health || 500,
+                power: power || 100,
                 accountId: user.id, // JWT에서 인증된 사용자 ID 사용
             },
         });
@@ -48,6 +50,41 @@ export const deleteCharacter = async (req, res) => {
 
         await prisma.character.delete({ where: { id: Number(characterId) } });
         res.status(200).json({ message: 'Character deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+//캐릭터 상세 조회 API
+
+export const getCharacterDetails = async (req, res) => {
+    const { id } = req.params;
+    const user = req.locals?.user;
+
+    try {
+        // 캐릭터 조회
+        const character = await prisma.character.findUnique({
+            where: { id: parseInt(id) },
+            include: { inventory: true }, // 필요시 관계 데이터도 로드
+        });
+
+        if (!character) {
+            return res.status(404).json({ error: "Character not found" });
+        }
+
+        // 기본 정보 반환
+        const response = {
+            name: character.name,
+            health: character.health, // 캐릭터 HP
+            power: character.power, // 캐릭터 힘 스탯
+        };
+
+        // 본인의 캐릭터일 경우 추가 정보 반환
+        if (user?.id === character.accountId) {
+            response.gameMoney = character.gameMoney; // 게임 머니
+        }
+
+        res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

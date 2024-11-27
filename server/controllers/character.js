@@ -20,7 +20,12 @@ export const createCharacter = async (req, res) => {
                 job: job || "adventurer",
                 health: health || 500,
                 power: power || 100,
-                accountId: user.id, // JWT에서 인증된 사용자 ID 사용
+                inventory: {
+                    create: {}
+                },
+                account: {
+                    connect: { id: user.id } // JWT에서 인증된 사용자 ID 사용
+                },
             },
         });
 

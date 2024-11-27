@@ -61,6 +61,8 @@ model Item {
   id             Int             @id @default(autoincrement()) // 아이템 ID
   name           String // 아이템 이름
   description    String? // 아이템 설명
+  stat           Json // 아이템 스탯
+  price          Int // 아이템 가격
   rarity         String          @default("common") // 아이템 희귀도
   inventoryitems InventoryItem[]
   equippeditems  EquippedItem[] // 

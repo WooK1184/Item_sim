@@ -10,7 +10,9 @@ export const createItem = async (req, res) => {
             data: {
                 name,
                 description,
+                stat,
                 rarity,
+                price: price,
             },
         });
         res.status(201).json(item);
@@ -48,9 +50,12 @@ export const getItemList = async (req, res) => {
         // 아이템 데이터 가져오기
         const items = await prisma.item.findMany({
             select: {
+                id : true, //아이템 코드
                 name: true, // 아이템 이름
+                stat: true,
                 description: true, // 아이템 설명
                 rarity: true, // 아이템 희귀도
+                price: true,
             },
         });
 

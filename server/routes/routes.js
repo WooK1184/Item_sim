@@ -2,6 +2,7 @@ import express from 'express';
 import { createItem } from '../controllers/item.js';
 import { createAccount } from '../controllers/account.js';
 import { createCharacter } from '../controllers/character.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -12,6 +13,6 @@ router.post('/items', createItem);
 router.post('/accounts', createAccount);
 
 // 캐릭터 생성 엔드포인트
-router.post('/characters', createCharacter);
+router.post('/character', authMiddleware, createCharacter);
 
 export default router;

@@ -25,7 +25,7 @@ model Account {
 model Character {
   id            Int            @id @default(autoincrement()) // 캐릭터 ID
   name          String // 캐릭터 이름
-  level         Int            @default(1) // 캐릭터 레벨
+  job           String // 캐릭터 직업
   accountId     Int // 소속 계정 ID
   account       Account        @relation(fields: [accountId], references: [id])
   inventoryId   Int            @unique

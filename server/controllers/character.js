@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 //캐릭터 생성 API
 export const createCharacter = async (req, res) => {
-    const { name, job } = req.body;
+    const { name, job, health, power } = req.body;
 
     // JWT를 통해 인증된 사용자 가져오기
     const user = req.locals?.user;

@@ -381,3 +381,41 @@ export const unequipItem = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// 캐릭터 게임 머니 벌기 API
+export const earnGameMoney = async (req, res) => {
+    const characterId = parseInt(req.params.id); // URI에서 캐릭터 ID 가져오기
+    const user = req.locals?.user; // JWT 인증된 사용자 정보 가져오기
+
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized: No user found' });
+    }
+
+    try {
+        // 캐릭터 조회
+        const character = await prisma.character.findUnique({
+            where: { id: characterId },
+            select: { id: true, accountId: true, gameMoney: true },
+        });
+
+        // 캐릭터가 존재하지 않거나, 소유자가 다른 경우
+        if (!character || character.accountId !== user.id) {
+            return res.status(403).json({ error: 'Forbidden: Character does not belong to user' });
+        }
+
+        // 게임 머니 100원 추가
+        const updatedCharacter = await prisma.character.update({
+            where: { id: characterId },
+            data: { gameMoney: character.gameMoney + 100 },
+            select: { gameMoney: true }, // 변경된 잔액만 반환
+        });
+
+        // 성공 응답
+        res.status(200).json({
+            message: 'Game money earned successfully',
+            updatedGameMoney: updatedCharacter.gameMoney,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

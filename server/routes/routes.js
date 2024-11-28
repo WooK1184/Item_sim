@@ -2,7 +2,7 @@ import express from 'express';
 import { createItem, getItemList, getItemDetails, updateItem, buyItems, sellItems } from '../controllers/item.js';
 import { createAccount } from '../controllers/account.js';
 import { login } from '../controllers/login.js';
-import { createCharacter, getCharacterDetails, deleteCharacter, getCharacterInventory } from '../controllers/character.js';
+import { createCharacter, getCharacterDetails, deleteCharacter, getCharacterInventory, getEquippedItems, equipItem, unequipItem } from '../controllers/character.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -24,6 +24,15 @@ router.delete('/character/:id', authMiddleware, deleteCharacter);
 
 // 캐릭터의 인벤토리 아이템 목록 조회
 router.get('/character/:id/inventory', authMiddleware, getCharacterInventory);
+
+// 캐릭터 아이템 장착
+router.post('/character/:id/equipitem', authMiddleware, equipItem)
+
+// 캐릭터 아이템 탈착
+router.put('/character/:id/unequipitem', authMiddleware, unequipItem )
+
+// 캐릭터 장착 아이템 조회
+router.get('/character/:id/equippeditems', getEquippedItems)
 
 // 아이템 생성
 router.post('/items', createItem);

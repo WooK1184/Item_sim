@@ -95,3 +95,96 @@ export const getCharacterDetails = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+//캐릭터 인벤토리 아이템 목록 조회 API
+
+export const getCharacterInventory = async (req, res) => {
+    const { id: characterId } = req.params;  // URI에서 캐릭터 ID를 받음
+    const user = req.locals?.user;  // JWT에서 인증된 사용자 가져오기
+
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized: No user found' });
+    }
+
+    try {
+        // 캐릭터 조회
+        const character = await prisma.character.findUnique({
+            where: { id: Number(characterId) },
+            include: {
+                inventory: {
+                    include: {
+                        inventoryItems: {
+                            include: {
+                                item: true,  // 아이템 정보 포함
+                            }
+                        }
+                    }
+                }
+            },
+        });
+
+        // 캐릭터가 없거나, 해당 캐릭터가 사용자와 연결되지 않은 경우
+        if (!character || character.accountId !== user.id) {
+            return res.status(403).json({ error: 'Forbidden: Character does not belong to user' });
+        }
+
+        // 인벤토리 내 아이템 목록 구성
+        const inventoryItems = character.inventory.inventoryItems.map(inventoryItem => ({
+            itemId: inventoryItem.item.id,
+            itemName: inventoryItem.item.name,
+            itemDescription: inventoryItem.item.description,
+            quantity: inventoryItem.quantity,
+            itemPrice: inventoryItem.item.price,
+            rarity: inventoryItem.item.rarity,
+        }));
+
+        // 결과 반환
+        res.status(200).json({
+            characterId: character.id,
+            inventoryItems
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// 장착한 아이템 목록 조회 API
+export const getEquippedItems = async (req, res) => {
+    const { id: characterId } = req.params;  // URI에서 캐릭터 ID를 받음
+
+    try {
+        // 캐릭터 조회 및 장착된 아이템들 조회
+        const character = await prisma.character.findUnique({
+            where: { id: Number(characterId) },
+            include: {
+                equippedItems: {
+                    include: {
+                        item: true,  // 아이템 정보 포함
+                    },
+                },
+            },
+        });
+
+        // 캐릭터가 존재하지 않는 경우
+        if (!character) {
+            return res.status(404).json({ error: "Character not found" });
+        }
+
+        // 장착된 아이템 목록이 비어있는 경우 빈 배열 반환
+        const equippedItems = character.equippedItems.map((equippedItem) => ({
+            itemId: equippedItem.item.id,
+            itemName: equippedItem.item.name,
+            itemDescription: equippedItem.item.description,
+            slot: equippedItem.slot,  // 장착된 슬롯 정보 (예: "weapon", "armor")
+        }));
+
+        // 결과 반환
+        res.status(200).json({
+            characterId: character.id,
+            equippedItems,  // 장착된 아이템 목록
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+

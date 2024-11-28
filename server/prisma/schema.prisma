@@ -55,6 +55,8 @@ model InventoryItem {
   quantity    Int       @default(1) // 아이템 개수
   createdAt   DateTime  @default(now()) // 생성 시각
   updatedAt   DateTime  @updatedAt // 업데이트 시각
+
+  @@unique([inventoryId, itemId]) // 복합 고유 제약조건 추가
 }
 
 model Item {

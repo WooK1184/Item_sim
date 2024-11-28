@@ -18,6 +18,8 @@ export const login = async (req, res) => {
 
         const token = jwt.sign({ id: account.id, username: account.username }, JWT_SECRET, { expiresIn: '5d' });
 
+        res.setHeader('Authorization', `Bearer ${token}`);
+
         res.status(200).json({ token });
     } catch (error) {
         res.status(500).json({ error: error.message });

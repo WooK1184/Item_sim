@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 // 아이템 생성 API
 export const createItem = async (req, res) => {
-    const { name, description, rarity } = req.body;
+    const { name, description, rarity, stat, price } = req.body;
 
     try {
         const item = await prisma.item.create({
@@ -52,10 +52,7 @@ export const getItemList = async (req, res) => {
             select: {
                 id : true, //아이템 코드
                 name: true, // 아이템 이름
-                stat: true,
-                description: true, // 아이템 설명
-                rarity: true, // 아이템 희귀도
-                price: true,
+                price: true, // 아이템 가격
             },
         });
 
@@ -75,10 +72,12 @@ export const getItemDetails = async (req, res) => {
         const item = await prisma.item.findUnique({
             where: { id: parseInt(id) },
             select: {
-                id: true, // 아이템 코드
+                id: true, //아이템 코드
                 name: true, // 아이템 이름
+                stat: true, // 아이템 스탯
                 description: true, // 아이템 설명
                 rarity: true, // 아이템 희귀도
+                price: true, // 아이템 가격
             },
         });
 

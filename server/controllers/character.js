@@ -80,6 +80,7 @@ export const getCharacterDetails = async (req, res) => {
         // 기본 정보 반환
         const response = {
             name: character.name,
+            job: character.job,
             health: character.health, // 캐릭터 HP
             power: character.power, // 캐릭터 힘 스탯
         };

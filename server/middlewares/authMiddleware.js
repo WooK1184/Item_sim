@@ -8,18 +8,22 @@ const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Unauthorized: Invalid token format' });
+        // 토큰이 없을 경우 사용자 정보를 null로 설정
+        req.locals = { user: null };
+        return next(); // 요청을 계속 진행
     }
 
     const token = authHeader.split(' ')[1];
 
     try {
-        const user = jwt.verify(token, JWT_SECRET);
+        const user = jwt.verify(token, JWT_SECRET); // 토큰 검증
         req.locals = { user }; // 사용자 정보 저장
-        next();
     } catch (error) {
-        return res.status(403).json({ error: 'Forbidden: Invalid or expired token' });
+        // 토큰 검증 실패 시 사용자 정보를 null로 설정
+        req.locals = { user: null };
     }
+
+    next(); // 요청 진행
 };
 
 export default authMiddleware;

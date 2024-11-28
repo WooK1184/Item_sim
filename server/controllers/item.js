@@ -97,6 +97,12 @@ export const buyItems = async (req, res) => {
     const characterId = parseInt(req.params.id);  // URI로부터 캐릭터 ID 가져오기
     const itemsToBuy = req.body;  // 구입할 아이템들의 정보 (id, count)
 
+    const user = req.locals?.user;
+
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized: No user found' });
+    }
+
     try {
         // 캐릭터 조회
         const character = await prisma.character.findUnique({
@@ -164,3 +170,106 @@ export const buyItems = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+// 아이템 판매 API
+
+export const sellItems = async (req, res) => {
+    const characterId = parseInt(req.params.id);  // URI로부터 캐릭터 ID 가져오기
+    const itemsToSell = req.body;  // 판매할 아이템들의 정보 (id, count)
+
+    const user = req.locals?.user;
+
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized: No user found' });
+    }
+
+    try {
+        // 캐릭터 조회
+        const character = await prisma.character.findUnique({
+            where: { id: characterId },
+            select: { gameMoney: true, inventoryId: true },
+        });
+
+        if (!character) {
+            return res.status(404).json({ error: "Character not found" });
+        }
+
+        let totalEarnings = 0; // 총 수익
+
+        for (const { itemId, count } of itemsToSell) {
+            // 판매할 아이템이 인벤토리에 있는지 확인 (장착 중인 아이템은 판매 불가)
+            const inventoryItem = await prisma.inventoryItem.findFirst({
+                where: {
+                    inventoryId: character.inventoryId,
+                    itemId,
+                    isEquipped: false, // 장착 중인 아이템은 제외
+                },
+                select: { quantity: true },
+            });
+
+            if (!inventoryItem || inventoryItem.quantity < count) {
+                return res.status(400).json({
+                    error: `Item with id ${itemId} is not available in sufficient quantity or is equipped.`
+                });
+            }
+
+            // 판매할 아이템 정보 가져오기
+            const item = await prisma.item.findUnique({
+                where: { id: itemId },
+                select: { price: true },
+            });
+
+            if (!item) {
+                return res.status(400).json({ error: `Item with id ${itemId} not found.` });
+            }
+
+            // 원가의 60%로 정산
+            const earnings = Math.floor(item.price * count * 0.6);
+            totalEarnings += earnings;
+
+            // 인벤토리에서 아이템 수량 감소
+            const updatedQuantity = inventoryItem.quantity - count;
+
+            if (updatedQuantity === 0) {
+                // 수량이 0이면 삭제
+                await prisma.inventoryItem.delete({
+                    where: {
+                        inventoryId_itemId: {
+                            inventoryId: character.inventoryId,
+                            itemId,
+                        },
+                    },
+                });
+            } else {
+                // 수량 업데이트
+                await prisma.inventoryItem.update({
+                    where: {
+                        inventoryId_itemId: {
+                            inventoryId: character.inventoryId,
+                            itemId,
+                        },
+                    },
+                    data: { quantity: updatedQuantity },
+                });
+            }
+        }
+
+        // 캐릭터의 게임 머니 업데이트
+        const updatedCharacter = await prisma.character.update({
+            where: { id: characterId },
+            data: { gameMoney: character.gameMoney + totalEarnings },
+            select: { gameMoney: true }, // 업데이트 후 남은 게임 머니 반환
+        });
+
+        // 성공 응답
+        res.status(200).json({
+            message: "Items sold successfully",
+            totalEarnings,
+            remainingGameMoney: updatedCharacter.gameMoney,
+        });
+    } catch (error) {
+        // 서버 에러 처리
+        res.status(500).json({ error: error.message });
+    }
+}

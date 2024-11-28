@@ -3,14 +3,14 @@ const prisma = new PrismaClient();
 
 // 아이템 생성 API
 export const createItem = async (req, res) => {
-    const { name, description, rarity, stat, price } = req.body;
+    const { name, stat, description, rarity, price } = req.body;
 
     try {
         const item = await prisma.item.create({
             data: {
                 name,
-                description,
                 stat,
+                description,
                 rarity,
                 price: price,
             },
@@ -24,13 +24,14 @@ export const createItem = async (req, res) => {
 //아이템 수정 API
 export const updateItem = async (req, res) => {
     const { id: itemId } = req.params;
-    const { name, description, rarity } = req.body;
+    const { name, stat, description, rarity } = req.body;
 
     try {
         const item = await prisma.item.update({
             where: { id: Number(itemId) },
             data: {
                 name,
+                stat,
                 description,
                 rarity,
             },

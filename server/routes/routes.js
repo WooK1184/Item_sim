@@ -2,7 +2,7 @@ import express from 'express';
 import { createItem, getItemList, getItemDetails, updateItem, buyItems, sellItems } from '../controllers/item.js';
 import { createAccount } from '../controllers/account.js';
 import { login } from '../controllers/login.js';
-import { createCharacter, getCharacterDetails, deleteCharacter, getCharacterInventory, getEquippedItems, equipItem, unequipItem } from '../controllers/character.js';
+import { createCharacter, getCharacterDetails, deleteCharacter, getCharacterInventory, getEquippedItems, equipItem, unequipItem, earnGameMoney } from '../controllers/character.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -33,6 +33,9 @@ router.put('/character/:id/unequipitem', authMiddleware, unequipItem )
 
 // 캐릭터 장착 아이템 조회
 router.get('/character/:id/equippeditems', getEquippedItems)
+
+// 캐릭터 게임머니 벌기
+router.put('/character/:id/earngamemoney', authMiddleware, earnGameMoney)
 
 // 아이템 생성
 router.post('/items', createItem);

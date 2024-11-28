@@ -393,7 +393,8 @@ export const earnGameMoney = async (req, res) => {
 
     try {
         // 캐릭터 조회
-        const character = await prisma.character.findUnique({
+        const character = await prisma.character.fin
+        dUnique({
             where: { id: characterId },
             select: { id: true, accountId: true, gameMoney: true },
         });

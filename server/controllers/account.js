@@ -16,7 +16,7 @@ const accountSchema = joi.object({
         .min(6) // 최소 6자 (보안 강화)
         .max(128) // 최대 128자
         .required(), // 필수 필드
-    confirmpassword: joi.string()
+    confirmPassword: joi.string()
         .valid(joi.ref('password')) // 비밀번호와 일치해야 함
         .required() // 필수 필드
         .messages({ 'any.only': 'Passwords do not match' }), // 에러 메시지

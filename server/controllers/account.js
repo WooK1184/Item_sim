@@ -5,7 +5,7 @@ import joi from 'joi'
 
 // joi 스키마 정의
 
-const accountSchema = Joi.object({
+const accountSchema = joi.object({
     username: joi.string()
         .pattern(/^[a-z0-9]+$/)
         .min(2) // 최소 3자

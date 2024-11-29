@@ -92,6 +92,8 @@ export const getItemDetails = async (req, res) => {
     }
 };
 
+// 아이템 구매 API
+
 export const buyItems = async (req, res) => {
     const characterId = parseInt(req.params.id);  // URI로부터 캐릭터 ID 가져오기
     const itemsToBuy = req.body;  // 구입할 아이템들의 정보 (id, count)
@@ -198,7 +200,7 @@ export const buyItems = async (req, res) => {
     }
 };
 
-
+// 아이템 판매 API
 
 export const sellItems = async (req, res) => {
     const characterId = parseInt(req.params.id);  // URI로부터 캐릭터 ID 가져오기

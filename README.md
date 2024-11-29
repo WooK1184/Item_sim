@@ -2,7 +2,7 @@
 
 <h3>Project - 아이템 시뮬레이터 개발</h3>
 
-AWS RDS, Prisma를 활용하여 데이터베이스를 기반으로 아이템 시뮬레이터를 구현
+AWS RDS, Prisma를 활용하여 데이터베이스를 기반으로한 아이템 시뮬레이터를 구현
 
 <br>
 
@@ -39,6 +39,7 @@ $ npm install
 $ npm install dotenv
 $ npm install prisma @prisma/client
 $ npm install jsonwebtoken
+$ npm install joi
 $ node server.js 
 ```
 ---
@@ -72,27 +73,18 @@ $ node server.js
 
   <h3> 📖 API 명세서 </h3>
 
+ https://www.notion.so/14d394b55f03800cbcd7fff052a7bee8?v=e8fc3374c6a34f62a0521f14950d1313&pvs=4
+   
    <br>
 
    </details>
 
 
-   ## 게임 구조 📺
+   ## 시뮬레이터 구조 📺
+   
 | API 요청 화면 |
 | :--------------------------------------------: |
 | ![image](https://github.com/user-attachments/assets/56b88d59-3068-49d4-b444-72039e47f63e) |
-
-| 업적 화면 |
-| :--------------------------------------------: |
-| ![image](https://github.com/user-attachments/assets/bcdb3d35-2b90-4e7b-8be9-82ba793a4b97) |
-
-| 게임 화면 |
-| :--------------------------------------------: |
-| ![image](https://github.com/user-attachments/assets/21bbc4c5-9fb0-4314-babc-801e3135bb78)|
-
-| 인벤토리 화면 |
-| :--------------------------------------------: |
-| ![image](https://github.com/user-attachments/assets/59f0122f-8881-4f6c-b358-bd358ae55930) |
 
 <br>
 
